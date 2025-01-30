@@ -3,6 +3,7 @@ package com.ecommerce.order.service;
 import com.ecommerce.order.entity.Order;
 import com.ecommerce.order.kafka.OrderEventProducer;
 import com.ecommerce.order.repository.OrderRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -27,7 +28,7 @@ public class OrderService {
         return orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
     }
 
-    public Order placeOrder(Long productId, Integer quantity) {
+    public Order placeOrder(Long productId, Integer quantity) throws JsonProcessingException {
         Order order = Order.builder()
                 .productId(productId)
                 .quantity(quantity)
@@ -36,7 +37,7 @@ public class OrderService {
                 .build();
         orderRepository.save(order);
 
-        orderEventProducer.sendOrderEvent("Order Created: " + order.getId());
+        orderEventProducer.sendOrderEvent(order.getId());
 
         return order;
     }

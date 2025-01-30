@@ -33,3 +33,5 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/order-service:latest
           docker build -t ${{ secrets.DOCKER_USERNAME }}/product-service:latest ./product-service
           docker push ${{ secrets.DOCKER_USERNAME }}/product-service:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/payment-service:latest ./payment-service
+          docker push ${{ secrets.DOCKER_USERNAME }}/payment-service:latest

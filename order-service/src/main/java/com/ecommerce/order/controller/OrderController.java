@@ -2,6 +2,7 @@ package com.ecommerce.order.controller;
 
 import com.ecommerce.order.entity.Order;
 import com.ecommerce.order.service.OrderService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +28,7 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<Order> placeOrder(@RequestParam Long productId, @RequestParam Integer quantity) {
+    public ResponseEntity<Order> placeOrder(@RequestParam Long productId, @RequestParam Integer quantity) throws JsonProcessingException {
         return ResponseEntity.ok(orderService.placeOrder(productId, quantity));
     }
 

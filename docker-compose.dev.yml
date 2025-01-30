@@ -1,0 +1,74 @@
+services:
+  mysql:
+    image: mysql:latest
+    restart: always
+    container_name: ecommerce-microservices-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ecommerce_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      retries: 5
+    ports:
+      - "3306:3306"
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    restart: always
+    container_name: ecommerce-microservices-zookeeper
+    platform: linux/amd64
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: wurstmeister/kafka
+    restart: always
+    container_name: ecommerce-microservices-kafka
+    environment:
+      KAFKA_LISTENERS: PLAINTEXT://:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    ports:
+      - "9092:9092"
+
+  order-service:
+    build:
+      context: ./order-service
+    restart: always
+    container_name: ecommerce-microservices-order-service
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mysql
+      - kafka
+
+  product-service:
+    build:
+      context: ./product-service
+    restart: always
+    container_name: ecommerce-microservices-product-service
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    ports:
+      - "8081:8081"
+    depends_on:
+      - kafka
+
+  payment-service:
+    build:
+      context: ./payment-service
+    restart: always
+    container_name: ecommerce-microservices-payment-service
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    ports:
+      - "8083:8083"
+    depends_on:
+      - kafka
+
+# Use `docker-compose -f docker-compose.dev.yml up --build -d` to start Dev environment
